@@ -1,0 +1,12 @@
+name: LM Studio Model
+version: 0.0.1
+schema: v1
+models:
+  - provider: lmstudio
+    model: qwen2.5-8b-instruct
+    name: LM Studio Qwen 2.5 8B
+    apiBase: http://localhost:1234/v1
+    roles:
+      - chat
+      - edit
+      - apply

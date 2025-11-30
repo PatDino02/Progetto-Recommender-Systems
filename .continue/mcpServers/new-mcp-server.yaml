@@ -1,0 +1,9 @@
+name: Recommender System MCP
+version: 0.0.1
+schema: v1
+mcpServers:
+  - name: Recommender System
+    command: python
+    args:
+      - C:\Users\Patrick\Desktop\progetto\mcp_server\recommender_server.py
+    env: {}
