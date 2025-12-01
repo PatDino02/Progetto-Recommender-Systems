@@ -87,3 +87,4 @@ cd C:\Users\Patrick\Desktop\progetto\mcp_server
 .venv\Scripts\python.exe generate_dataset.py
 ```
 
+ cd "C:\Users\Patrick\Desktop\Progetto Recommender Systems\mcp_server"; python recommender_server.py

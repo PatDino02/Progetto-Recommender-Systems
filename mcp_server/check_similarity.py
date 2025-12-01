@@ -42,19 +42,4 @@ def calculate_similarity(user1_ratings, user2_ratings):
     # Normalize from [-1, 1] to [0, 1] for compatibility
     return (correlation + 1) / 2, len(common)
 
-# Calcola similarità per User 3
-user_3_ratings = pivot.loc[3]
-similarities = []
 
-for user_id in pivot.index:
-    if user_id != 3:
-        other_ratings = pivot.loc[user_id]
-        sim, n_common = calculate_similarity(user_3_ratings, other_ratings)
-        similarities.append((user_id, sim, n_common))
-
-# Ordina per similarità
-similarities.sort(key=lambda x: x[1], reverse=True)
-
-print("Top 10 utenti simili a User 3:\n")
-for user_id, sim, n_common in similarities[:10]:
-    print(f"User {user_id}: similarity = {sim:.4f} ({n_common} film in comune)")

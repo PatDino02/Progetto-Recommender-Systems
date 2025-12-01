@@ -300,7 +300,9 @@ async def get_similar_users(user_id: int, top_n: int = 5) -> str:
                 other_user_ratings = user_item_matrix.loc[other_user]
                 sim = calculate_user_similarity(target_user_ratings, other_user_ratings)
                 if sim > 0:
-                    similarities.append((other_user, sim))
+                    # Count common items (both rated)
+                    common_items = (~target_user_ratings.isna() & ~other_user_ratings.isna()).sum()
+                    similarities.append((other_user, sim, common_items))
         
         # Sort and get top N
         similarities.sort(key=lambda x: x[1], reverse=True)
@@ -309,8 +311,12 @@ async def get_similar_users(user_id: int, top_n: int = 5) -> str:
         result = {
             'user_id': user_id,
             'similar_users': [
-                {'user_id': int(uid), 'similarity_score': float(score)}
-                for uid, score in top_similar
+                {
+                    'user_id': int(uid), 
+                    'similarity_score': float(score),
+                    'common_items': int(common)
+                }
+                for uid, score, common in top_similar
             ]
         }
         

@@ -117,14 +117,14 @@ for u1, u2 in user_pairs:
     if common > 0:
         overlap_stats.append(common)
         if common < 3:
-            print(f"⚠️  User {u1} e User {u2}: solo {common} film in comune")
+            print(f"  User {u1} e User {u2}: solo {common} film in comune")
 
 if overlap_stats:
-    print(f"\n✓ Overlap medio: {np.mean(overlap_stats):.1f} film")
-    print(f"✓ Overlap minimo: {min(overlap_stats)} film")
-    print(f"✓ Overlap massimo: {max(overlap_stats)} film")
+    print(f"\n Overlap medio: {np.mean(overlap_stats):.1f} film")
+    print(f" Overlap minimo: {min(overlap_stats)} film")
+    print(f" Overlap massimo: {max(overlap_stats)} film")
 else:
-    print("\n✓ Nessun overlap tra utenti di cluster diversi")
+    print("\n Nessun overlap tra utenti di cluster diversi")
 
 # Salva i file
 output_path = Path(__file__).parent.parent / "data" / "ratings.csv"
@@ -138,7 +138,7 @@ movies_path = Path(__file__).parent.parent / "data" / "movies.csv"
 movies_df.to_csv(movies_path, index=False)
 
 print(f"\n{'=' * 70}")
-print(f"✓ Dataset generato: {len(df)} ratings")
+print(f" Dataset generato: {len(df)} ratings")
 print(f"   - Utenti: {df['user_id'].nunique()}")
 print(f"   - Film: {df['item_id'].nunique()}")
 print(f"   - Rating medio: {df['rating'].mean():.2f}")
