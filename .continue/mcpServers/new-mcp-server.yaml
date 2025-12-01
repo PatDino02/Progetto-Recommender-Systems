@@ -5,5 +5,5 @@ mcpServers:
   - name: Recommender System
     command: python
     args:
-      - C:\Users\Patrick\Desktop\progetto\mcp_server\recommender_server.py
+      - C:\Users\Patrick\Desktop\Progetto Recommender Systems\mcp_server\recommender_server.py
     env: {}

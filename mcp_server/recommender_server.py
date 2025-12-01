@@ -22,17 +22,24 @@ logger = logging.getLogger(__name__)
 
 # Global variables for data storage
 ratings_df: pd.DataFrame = None
+movies_df: pd.DataFrame = None
 DATA_PATH = Path(__file__).parent.parent / "data" / "ratings.csv"
+MOVIES_PATH = Path(__file__).parent.parent / "data" / "movies.csv"
 
 
 def load_or_initialize_data():
     """Load ratings data or initialize with sample data."""
-    global ratings_df
+    global ratings_df, movies_df
     
     try:
         if DATA_PATH.exists():
             ratings_df = pd.read_csv(DATA_PATH)
             logger.info(f"Loaded {len(ratings_df)} ratings from {DATA_PATH}")
+        
+        # Load movies mapping if exists
+        if MOVIES_PATH.exists():
+            movies_df = pd.read_csv(MOVIES_PATH)
+            logger.info(f"Loaded {len(movies_df)} movies from {MOVIES_PATH}")
         else:
             # Initialize with sample data
             logger.info("Creating sample data...")
@@ -172,14 +179,25 @@ async def get_recommendations(user_id: int, top_n: int = 5) -> str:
             reverse=True
         )[:top_n]
         
-        # Format result
+        # Format result with movie titles if available
         result = {
             'user_id': user_id,
-            'recommendations': [
-                {'item_id': int(item), 'predicted_rating': float(rating)}
-                for item, rating in sorted_predictions
-            ]
+            'recommendations': []
         }
+        
+        for item, rating in sorted_predictions:
+            rec_item = {
+                'item_id': int(item),
+                'predicted_rating': float(rating)
+            }
+            
+            # Add movie title if available
+            if movies_df is not None:
+                movie_info = movies_df[movies_df['item_id'] == item]
+                if not movie_info.empty:
+                    rec_item['title'] = movie_info.iloc[0]['title']
+            
+            result['recommendations'].append(rec_item)
         
         return str(result)
         
