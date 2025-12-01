@@ -40,20 +40,6 @@ def load_or_initialize_data():
         if MOVIES_PATH.exists():
             movies_df = pd.read_csv(MOVIES_PATH)
             logger.info(f"Loaded {len(movies_df)} movies from {MOVIES_PATH}")
-        else:
-            # Initialize with sample data
-            logger.info("Creating sample data...")
-            sample_data = {
-                'user_id': [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5],
-                'item_id': [101, 102, 103, 101, 102, 104, 102, 103, 104, 101, 103, 105, 102, 104, 105],
-                'rating': [5.0, 3.0, 4.0, 4.0, 2.0, 5.0, 3.0, 5.0, 4.0, 5.0, 4.0, 3.0, 2.0, 5.0, 4.0]
-            }
-            ratings_df = pd.DataFrame(sample_data)
-            
-            # Save sample data
-            DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-            ratings_df.to_csv(DATA_PATH, index=False)
-            logger.info(f"Saved sample data to {DATA_PATH}")
             
     except Exception as e:
         logger.error(f"Error loading data: {e}")
@@ -62,14 +48,14 @@ def load_or_initialize_data():
 
 def calculate_user_similarity(user1_ratings: pd.Series, user2_ratings: pd.Series) -> float:
     """
-    Calculate cosine similarity between two users based on common rated items.
+    Calculate Pearson correlation between two users based on common rated items.
     
     Args:
         user1_ratings: Ratings of user 1
         user2_ratings: Ratings of user 2
     
     Returns:
-        Similarity score between 0 and 1
+        Similarity score between -1 and 1 (normalized to 0-1)
     """
     # Find common items (must be rated by both users - not NaN)
     common_items = user1_ratings.index.intersection(user2_ratings.index)
@@ -83,22 +69,36 @@ def calculate_user_similarity(user1_ratings: pd.Series, user2_ratings: pd.Series
     r1 = user1_ratings[common_items].values
     r2 = user2_ratings[common_items].values
     
-    # Calculate cosine similarity
-    dot_product = np.dot(r1, r2)
-    norm1 = np.linalg.norm(r1)
-    norm2 = np.linalg.norm(r2)
-    
-    if norm1 == 0 or norm2 == 0:
+    # Need at least 2 items for correlation
+    if len(r1) < 2:
         return 0.0
     
-    return float(dot_product / (norm1 * norm2))
+    # Calculate means
+    mean1 = np.mean(r1)
+    mean2 = np.mean(r2)
+    
+    # Center the ratings
+    r1_centered = r1 - mean1
+    r2_centered = r2 - mean2
+    
+    # Calculate Pearson correlation
+    numerator = np.sum(r1_centered * r2_centered)
+    denominator = np.sqrt(np.sum(r1_centered ** 2) * np.sum(r2_centered ** 2))
+    
+    if denominator == 0:
+        return 0.0
+    
+    correlation = numerator / denominator
+    
+    # Normalize from [-1, 1] to [0, 1] for compatibility
+    return float((correlation + 1) / 2)
 
 
 @mcp.tool()
 async def get_recommendations(user_id: int, top_n: int = 5) -> str:
     """
     Get top N item recommendations for a user using collaborative filtering.
-    Uses user-based collaborative filtering with cosine similarity.
+    Uses user-based collaborative filtering with Pearson correlation.
     
     Args:
         user_id: ID of the user to get recommendations for
