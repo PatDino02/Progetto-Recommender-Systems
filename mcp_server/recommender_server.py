@@ -9,18 +9,18 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 import logging
 
-# Initialize FastMCP server
+# Inizializazzione FastMCP server
 mcp = FastMCP("recommender-systems")
 
-# Setup logging to stderr (NOT stdout - as per MCP guidelines)
+# Configuro il logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]  # Writes to stderr by default
+    handlers=[logging.StreamHandler()]  # scrivo i log sulla console
 )
 logger = logging.getLogger(__name__)
 
-# Global variables for data storage
+# variabili globali per i dati
 ratings_df: pd.DataFrame = None
 movies_df: pd.DataFrame = None
 DATA_PATH = Path(__file__).parent.parent / "data" / "ratings.csv"
@@ -36,7 +36,7 @@ def load_or_initialize_data():
             ratings_df = pd.read_csv(DATA_PATH)
             logger.info(f"Loaded {len(ratings_df)} ratings from {DATA_PATH}")
         
-        # Load movies mapping if exists
+        # carico anche i dati dei film se disponibili
         if MOVIES_PATH.exists():
             movies_df = pd.read_csv(MOVIES_PATH)
             logger.info(f"Loaded {len(movies_df)} movies from {MOVIES_PATH}")
